@@ -1,0 +1,70 @@
+<section class="todoapp">
+    <header class="header">
+        <h1>Todos</h1>
+        <input
+                v-model="newTodo"
+                @keyup.enter="addTodo"
+                type="text"
+                class="new-todo"
+                placeholder="Add a new task ..."
+        >
+    </header>
+
+    <div class="main">
+        <input v-model="allDone" type="checkbox" id="toggle-all" class="toggle-all">
+        <label for="toggle-all">Mark all as complete</label>
+
+        <ul class="todo-list">
+            <li
+                    v-for="todo in filteredTodos"
+                    :key="todo.id"
+                    :class="{completed: todo.completed, editing: todo === editingTodo}"
+                    class="todo"
+            >
+                <div class="view">
+                    <input v-model="todo.completed" type="checkbox" class="toggle">
+                    <label @dblclick="startEditing(todo)">
+                        {{ todo.name }}
+                    </label>
+                    <button class="destroy" @click="deleteTodo(todo)"></button>
+                </div>
+
+                <input
+                        v-model="todo.name"
+                        v-focus="todo === editingTodo"
+                        @keyup.enter="stopEditing"
+                        @blur="stopEditing"
+                        @keyup.escape="cancelEditing()"
+                        type="text"
+                        class="edit"
+                >
+            </li>
+        </ul>
+    </div>
+
+    <footer class="footer" v-show="hasTodos">
+            <span class="todo-count">
+                <strong>
+                    {{ remaining }}
+                </strong>
+
+                item{{ remaining > 1 ? 's' : '' }} left
+            </span>
+
+        <ul class="filters">
+            <li v-for="filter in filters" :key="filter.code">
+                <a
+                        href="#"
+                        :class="{selected: selectedFilter === filter.code}"
+                        @click.prevent="applyFilter(filter.code)"
+                >
+                    {{ filter.label }}
+                </a>
+            </li>
+        </ul>
+
+        <button class="clear-completed" v-show="hasCompletedTodos" @click="deleteCompletedTodos">
+            Clear completed
+        </button>
+    </footer>
+</section>
