@@ -5,6 +5,12 @@
 yarn install
 ```
 
+### Define env vars
+```
+VUE_APP_API_HOST=https://api.todo.wip
+VUE_APP_API_ROUTING=https://api.todo.wip/bundles/fosjsrouting/js/router.min.js
+```
+
 ### Compiles and hot-reloads for development
 ```
 yarn run serve
