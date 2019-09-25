@@ -8,6 +8,7 @@
                 class="new-todo"
                 placeholder="Add a new task ..."
         >
+        <i class="loader fas fa-circle-notch fa-spin" v-if="requesting"></i>
     </header>
 
     <div class="main">
@@ -22,7 +23,7 @@
                     class="todo"
             >
                 <div class="view">
-                    <input v-model="todo.completed" type="checkbox" class="toggle">
+                    <input :checked="todo.completed" @change="(event) => updateTodoState(event, todo)" type="checkbox" class="toggle">
                     <label @dblclick="startEditing(todo)">
                         {{ todo.name }}
                     </label>
@@ -30,10 +31,9 @@
                 </div>
 
                 <input
-                        v-model="todo.name"
+                        v-model="editingName"
                         v-focus="todo === editingTodo"
                         @keyup.enter="stopEditing"
-                        @blur="stopEditing"
                         @keyup.escape="cancelEditing()"
                         type="text"
                         class="edit"
@@ -42,13 +42,13 @@
         </ul>
     </div>
 
-    <footer class="footer" v-show="hasTodos">
+    <footer class="footer" v-show="todos">
             <span class="todo-count">
                 <strong>
-                    {{ remaining }}
+                    {{ activeCount }}
                 </strong>
 
-                item{{ remaining > 1 ? 's' : '' }} left
+                item{{ activeCount > 1 ? 's' : '' }} left
             </span>
 
         <ul class="filters">
@@ -63,7 +63,7 @@
             </li>
         </ul>
 
-        <button class="clear-completed" v-show="hasCompletedTodos" @click="deleteCompletedTodos">
+        <button class="clear-completed" v-show="completed" @click="deleteCompletedTodos">
             Clear completed
         </button>
     </footer>

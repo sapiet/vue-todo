@@ -1,37 +1,24 @@
-<template src="./todos.html"></template>
-<style src="./todos.css"></style>
+<template src="./Todos.html"></template>
+<style src="./Todos.css"></style>
 
 <script>
 import Vue from 'vue'
+import store from './TodosStore';
+import Vuex from 'vuex';
 
 export default {
+    store: store,
     data() {
         return {
             filters: {
-                all: {
-                    code: 'all',
-                    label: 'All',
-                    filter: todos => todos
-                },
-                active: {
-                    code: 'active',
-                    label: 'Active',
-                    filter: todos => todos.filter(todo => !todo.completed)
-                },
-                completed: {
-                    code: 'completed',
-                    label: 'Completed',
-                    filter: todos => todos.filter(todo => todo.completed)
-                }
+                all: {code: 'all', label: 'All'},
+                active: {code: 'active', label: 'Active'},
+                completed: {code: 'completed', label: 'Completed'}
             },
-            todos: [
-                {id: 1, name: 'Installer NodeJS', completed: true},
-                {id: 2, name: 'Apprendre VueJS', completed: false}
-            ],
             newTodo: '',
             selectedFilter: 'all',
             editingTodo: null,
-            lastName: null
+            editingName: null
         }
     },
     directives: {
@@ -42,65 +29,73 @@ export default {
         }
     },
     computed: {
-        remaining() {
-            return this.filters.active.filter(this.todos).length
-        },
-
-        filteredTodos() {
-            return this.filters[this.selectedFilter].filter(this.todos)
-        },
+        ...Vuex.mapGetters([
+            'requesting',
+            'todos',
+            'all',
+            'active',
+            'completed',
+            'activeCount',
+            'completedCount',
+        ]),
 
         allDone: {
             get() {
-                return this.remaining === 0
+                return this.activeCount === 0
             },
 
             set(value) {
-                this.todos.map(todo => todo.completed = value)
+                store.dispatch('updateTodosStates', value);
             }
         },
 
-        hasTodos() {
-            return this.todos.length > 0
+        filteredTodos() {
+            return this[this.selectedFilter];
         },
-
-        hasCompletedTodos() {
-            return this.filters.completed.filter(this.todos).length > 0;
-        }
     },
     methods: {
-        addTodo() {
-            this.todos.push({
-                name: this.newTodo,
-                completed: false
-            });
+        ...Vuex.mapActions({
+            addTodoStore: 'addTodo',
+            deleteTodoStore: 'deleteTodo',
+            updateTodoStateStore: 'updateTodoState',
+            updateTodoNameStore: 'updateTodoName',
+            deleteCompletedTodosStore: 'deleteCompletedTodos'
+        }),
 
+        updateTodoState(event, todo) {
+            this.updateTodoStateStore({todo, completed: event.target.checked});
+        },
+
+        addTodo() {
+            this.addTodoStore(this.newTodo);
             this.newTodo = '';
         },
 
         deleteTodo(todo) {
-            this.todos.splice(this.todos.indexOf(todo), 1);
+            if (confirm(`You are going to delete "${todo.name}", Are you sure ?`)) {
+                this.deleteTodoStore(todo);
+            }
         },
 
         deleteCompletedTodos() {
-            for (let todo of this.filters.completed.filter(this.todos)) {
-                this.todos.splice(this.todos.indexOf(todo), 1)
+            if (confirm(`You are going to delete ${this.completedCount} completed todos, Are you sure ?`)) {
+                this.deleteCompletedTodosStore();
             }
         },
 
         startEditing(todo) {
-            this.lastName = todo.name;
-            this.editingTodo = todo
+            this.editingName = todo.name;
+            this.editingTodo = todo;
         },
 
         stopEditing() {
-            this.lastName = null;
-            this.editingTodo = null
+            this.updateTodoNameStore({todo: this.editingTodo, name: this.editingName});
+            this.cancelEditing();
         },
 
         cancelEditing() {
-            this.editingTodo.name = this.lastName;
-            this.stopEditing()
+            this.editingName = null;
+            this.editingTodo = null;
         },
 
         applyFilter(filter) {
