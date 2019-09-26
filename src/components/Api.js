@@ -25,6 +25,10 @@ class Api {
         return window.Routing.generate(endpoint, parameters).substr(1);
     }
 
+    transformIRI(iri) {
+        return iri.substr(1);
+    }
+
     getTodos() {
         return Vue.http.get(this.generateUrl('api_todos_get_collection'));
     }
@@ -34,24 +38,11 @@ class Api {
     }
 
     deleteTodo(todo) {
-        return Vue.http.delete(this.generateUrl(
-            'api_todos_delete_item',
-            {id: todo.id}
-        ));
+        return Vue.http.delete(this.transformIRI(todo['@id']));
     }
 
-    updateTodoState(todo, completed) {
-        return Vue.http.put(
-            this.generateUrl('api_todos_put_item', {id: todo.id}),
-            {completed}
-        );
-    }
-
-    updateTodoName(todo, name) {
-        return Vue.http.put(
-            this.generateUrl('api_todos_put_item', {id: todo.id}),
-            {name}
-        );
+    updateTodo(todo, data) {
+        return Vue.http.put(this.transformIRI(todo['@id']), data);
     }
 }
 

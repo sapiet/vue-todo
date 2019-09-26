@@ -73,12 +73,12 @@ const actions = {
     },
 
     updateTodoState: (store, parameters) => {
-        Api.updateTodoState(parameters.todo, parameters.completed).then();
+        Api.updateTodo(parameters.todo, {completed: parameters.completed}).then();
         store.commit('updateTodoState', parameters);
     },
 
     updateTodoName: (store, parameters) => {
-        Api.updateTodoName(parameters.todo, parameters.name).then();
+        Api.updateTodo(parameters.todo, {name: parameters.name}).then();
         store.commit('updateTodoName', parameters);
     },
 
