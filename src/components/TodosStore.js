@@ -26,7 +26,7 @@ const mutations = {
     },
 
     addTodo: (state, todo) => {
-        state.todos.push(todo);
+        state.todos.unshift(todo);
     },
 
     deleteTodo: (state, todo) => {
@@ -62,7 +62,7 @@ const actions = {
     },
 
     deleteTodo: (store, todo) => {
-        Api.deleteTodo(todo).then();
+        Api.updateTodo(todo, {deleted: true}).then();
         store.commit('deleteTodo', todo);
     },
 

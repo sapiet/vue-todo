@@ -37,10 +37,6 @@ class Api {
         return Vue.http.post(this.generateUrl('api_todos_post_collection'), todo);
     }
 
-    deleteTodo(todo) {
-        return Vue.http.delete(this.transformIRI(todo['@id']));
-    }
-
     updateTodo(todo, data) {
         return Vue.http.put(this.transformIRI(todo['@id']), data);
     }
