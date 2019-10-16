@@ -100,6 +100,18 @@ export default {
 
         applyFilter(filter) {
             this.selectedFilter = filter;
+            window.location.hash = filter;
+        },
+
+        filterExists(filter) {
+            return Object.keys(this.filters).indexOf(filter) >= 0;
+        }
+    },
+    mounted() {
+        const hash = window.location.hash.substr(1);
+
+        if (this.filterExists(hash)) {
+            this.applyFilter(hash);
         }
     }
 }
